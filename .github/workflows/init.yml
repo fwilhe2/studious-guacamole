@@ -14,3 +14,7 @@ jobs:
     - name: build
       run: |
         ./gradlew runReleaseExecutableNative
+    - uses: 'actions/upload-artifact@v2'
+      with:
+          name: App-${{ matrix.os }}
+          path: ${{ github.workspace }}
