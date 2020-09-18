@@ -19,19 +19,19 @@ jobs:
       shell: bash
 
     - uses: 'actions/upload-artifact@v2'
-      if: matrix.os == "ubuntu-20.04"
+      if: matrix.os == 'ubuntu-20.04'
       with:
           name: App-linux
           path: build/bin/native/releaseExecutable/untitled.kexe
 
     - uses: 'actions/upload-artifact@v2'
-      if: matrix.os == "macos-latest"
+      if: matrix.os == 'macos-latest'
       with:
           name: App-darwin
           path: build/bin/native/releaseExecutable/untitled.kexe
           
     - uses: 'actions/upload-artifact@v2'
-      if: matrix.os == "windows-latest"
+      if: matrix.os == 'windows-latest'
       with:
           name: App-windows
           path: build/bin/native/releaseExecutable/untitled.exe
