@@ -14,9 +14,56 @@ jobs:
     - name: build
       run: |
         ./gradlew linkReleaseExecutableNative
+        find build
         ls -la build/bin/native/releaseExecutable/
       shell: bash
+
     - uses: 'actions/upload-artifact@v2'
+      if: ${{ matrix.os }} == "ubuntu-20.04"
       with:
-          name: App-${{ matrix.os }}
+          name: App-linux
           path: build/bin/native/releaseExecutable/untitled.kexe
+
+    - uses: 'actions/upload-artifact@v2'
+      if: ${{ matrix.os }} == "macos-latest"
+      with:
+          name: App-darwin
+          path: build/bin/native/releaseExecutable/untitled.kexe
+          
+    - uses: 'actions/upload-artifact@v2'
+      if: ${{ matrix.os }} == "windows-latest"
+      with:
+          name: App-windows
+          path: build/bin/native/releaseExecutable/untitled.exe
+  release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [linux, darwin, windows]
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: App-${{ matrix.os }}
+          path: ${{ github.workspace }}/${{ matrix.os }}
+      - name: get timestamp
+        id: time
+        run: echo "::set-output name=action_fruit::`date -u +\"%Y-%m-%dT%H-%M-%S%Z\"`"
+      - run: echo ${{ steps.time.outputs.action_fruit }}
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.time.outputs.action_fruit }}
+      - run: zip -r foo.zip .
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./foo.zip
+          asset_name: foo.zip
+          asset_content_type: application/zip
