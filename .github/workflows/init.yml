@@ -13,8 +13,10 @@ jobs:
     - uses: actions/checkout@v2
     - name: build
       run: |
-        ./gradlew runReleaseExecutableNative
+        ./gradlew linkReleaseExecutableNative
+        ls -la build/bin/native/releaseExecutable/
+      shell: bash
     - uses: 'actions/upload-artifact@v2'
       with:
           name: App-${{ matrix.os }}
-          path: ${{ github.workspace }}
+          path: build/bin/native/releaseExecutable/untitled.kexe
