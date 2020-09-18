@@ -19,33 +19,38 @@ jobs:
       shell: bash
 
     - uses: 'actions/upload-artifact@v2'
-      if: ${{ matrix.os }} == "ubuntu-20.04"
+      if: matrix.os == "ubuntu-20.04"
       with:
           name: App-linux
           path: build/bin/native/releaseExecutable/untitled.kexe
 
     - uses: 'actions/upload-artifact@v2'
-      if: ${{ matrix.os }} == "macos-latest"
+      if: matrix.os == "macos-latest"
       with:
           name: App-darwin
           path: build/bin/native/releaseExecutable/untitled.kexe
           
     - uses: 'actions/upload-artifact@v2'
-      if: ${{ matrix.os }} == "windows-latest"
+      if: matrix.os == "windows-latest"
       with:
           name: App-windows
           path: build/bin/native/releaseExecutable/untitled.exe
   release:
     runs-on: ubuntu-latest
     needs: [build]
-    strategy:
-      matrix:
-        os: [linux, darwin, windows]
     steps:
       - uses: actions/download-artifact@v2
         with:
-          name: App-${{ matrix.os }}
-          path: ${{ github.workspace }}/${{ matrix.os }}
+          name: App-linux
+          path: ${{ github.workspace }}/linux
+      - uses: actions/download-artifact@v2
+        with:
+          name: App-darwin
+          path: ${{ github.workspace }}/darwin
+      - uses: actions/download-artifact@v2
+        with:
+          name: App-windows
+          path: ${{ github.workspace }}/windows
       - name: get timestamp
         id: time
         run: echo "::set-output name=action_fruit::`date -u +\"%Y-%m-%dT%H-%M-%S%Z\"`"
